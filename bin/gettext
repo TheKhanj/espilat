@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+
+mkdir reports
+
+get_single() {
+	local id="$1"
+	local title="$2"
+	local link="$3"
+
+	curl -L --retry 100 "$link" |
+		pup '.entry div text{}' |
+		sed '/^$/d' >"reports/$id.txt"
+}
+
+ID=1
+cat reports.json | jq -c | while read -r line; do
+	href="$(echo "$line" | jq '.href' -r)"
+	title="$(echo "$line" | jq '.title' -r)"
+
+	get_single "$ID" "$title" "$href"
+
+	ID=$((ID + 1))
+done

@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+rm reports.json
+
+for i in $(seq 70); do
+	curl --retry 10 -L "https://espilat.com/new/category/weekly-club/page/$i/" |
+		pup '.post json{}' |
+		jq '.[] | { "href" : .children[0].children[0].href, "title":.children[0].children[0].text }' \
+			>>reports.json
+done
